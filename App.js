@@ -25,7 +25,6 @@ export default class App extends React.Component {
     let gold = Math.floor(Math.random()*(Number(max)-Number(min)+1))+Number(min);
     let currentGold = this.game.state.gold
     this.game.setState({gold:currentGold+gold})
-    Alert.alert(`You won ${gold} gold at the ${name}!\nCurrent gold: ${this.game.state.gold+gold}`);
   }
 
   render() {
