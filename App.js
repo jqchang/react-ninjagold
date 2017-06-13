@@ -1,45 +1,13 @@
 import React from 'react';
 import { Alert, StyleSheet, Text, View, Button } from 'react-native';
 
-class GameState {
-  constructor() {
-    this.gold = 0
-  }
-}
-
-class Statusbar extends React.Component {
-  constructor(props){
-    super(props)
-    this.state = {game:this.props.game}
-  }
-
-  render() {
-    return(
-      <View style={styles.statusbar}>
-        <Text>Gold: {this.props.game.gold}</Text>
-      </View>
-    );
-  }
-}
-
 class Ninja extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {game:this.props.game}
-    console.log(this.props.game)
-  }
   render() {
-    console.log(this.props.name, ":", Number(this.props.min)+Number(this.props.max))
     return (
       <View style={styles.ninja}>
         <Text>{this.props.name}</Text>
         <Text>{this.props.min} to {this.props.max} Gold</Text>
-        <Button onPress={() => {
-            let gold = Math.floor(Math.random()*(Number(this.props.max)-Number(this.props.min)+1))+Number(this.props.min);
-            this.state.game.gold += gold;
-            Alert.alert(`You won ${gold} gold at the ${this.props.name}!\nCurrent gold: ${this.state.game.gold}`);
-          }
-        } title="Visit"></Button>
+        <Button onPress={()=>{this.props.method(this.props.name, this.props.min, this.props.max)}} title="Visit"></Button>
       </View>
     );
   }
@@ -48,19 +16,30 @@ class Ninja extends React.Component {
 export default class App extends React.Component {
   constructor(props) {
     super(props);
-    game = new GameState();
-    this.state = {game:game};
+    this.state = {
+      gold:0
+    };
+  }
+
+  gamble(name, min, max) {
+    let gold = Math.floor(Math.random()*(Number(max)-Number(min)+1))+Number(min);
+    let currentGold = this.game.state.gold
+    this.game.setState({gold:currentGold+gold})
+    Alert.alert(`You won ${gold} gold at the ${name}!\nCurrent gold: ${this.game.state.gold+gold}`);
   }
 
   render() {
-    console.log("App.render");
     return (
       <View style={styles.container}>
-        <Text>Gold: {this.state.game.gold}</Text>
-        <Ninja name='Farm' min="2" max="5" game={this.state.game}/>
-        <Ninja name='House' min="5" max="15" game={this.state.game}/>
-        <Ninja name='Barn' min="1" max="10" game={this.state.game}/>
-        <Ninja name='Casino' min="-50" max="50" game={this.state.game}/>
+        <View style={styles.statusbar}>
+          <Text>Gold: {this.state.gold}</Text>
+        </View>
+        <View style={[styles.container, {flexDirection:'row', alignItems:'center'}]}>
+          <Ninja name='Farm' min="2" max="5" game={this} method={this.gamble}/>
+          <Ninja name='House' min="5" max="15" game={this} method={this.gamble}/>
+          <Ninja name='Barn' min="1" max="10" game={this} method={this.gamble}/>
+          <Ninja name='Casino' min="-50" max="50" game={this} method={this.gamble}/>
+        </View>
       </View>
     );
   }
@@ -69,21 +48,25 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexWrap: 'wrap',
     marginTop: 40,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
   },
   statusbar: {
-    marginTop: 40,
-    flex: 0.2,
+    flex: 0.1,
     backgroundColor: '#ddd',
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
   },
   ninja: {
-    flex: 1,
-    width: 150,
+    flex: 0.5,
+    width: '50%',
+    flexWrap: 'nowrap',
     backgroundColor: '#ff0',
     borderWidth: 1,
     borderColor: '#000',
